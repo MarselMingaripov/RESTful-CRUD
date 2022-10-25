@@ -4,9 +4,10 @@ import java.util.Set;
 
 public class SignupRequest {
     private String username;
+    private String password;
     private String email;
     private Set<String> roles;
-    private String password;
+
     public String getUsername() {
         return username;
     }
