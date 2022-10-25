@@ -1,6 +1,7 @@
 package ru.min.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import ru.min.entity.User;
 import ru.min.repository.UserRepository;
@@ -15,6 +16,7 @@ public class UserController {
     UserRepository userRepository;
 
     @GetMapping
+    @PreAuthorize("hasRole('USER') or hasRole('MODERATOR') or hasRole('ADMIN')")
     public Iterable<User> findAll(){
         return userRepository.findAll();
     }
@@ -25,6 +27,7 @@ public class UserController {
     }
 
     @PostMapping(consumes = "application/json")
+    @PreAuthorize("hasRole('ADMIN')")
     public User create(@RequestBody User user){
         return userRepository.save(user);
     }
