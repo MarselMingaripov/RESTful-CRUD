@@ -3,19 +3,14 @@ package ru.min.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.http.client.ClientHttpRequestExecution;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.client.HttpStatusCodeException;
-import org.springframework.web.server.ResponseStatusException;
 import ru.min.entity.Role;
 import ru.min.entity.User;
 import ru.min.repository.RoleRepository;
 import ru.min.repository.UserRepository;
-
-import javax.persistence.EntityManager;
 import java.util.Set;
 
 @RestController
@@ -51,7 +46,7 @@ public class UserController {
             return new ResponseEntity<>(null, HttpStatus.FORBIDDEN);
         }
     }
-
+    //todo добавить возможность передавать роль либо присваивать по умолчанию USER, если нет
     @PostMapping(consumes = "application/json")
     @PreAuthorize("hasRole('ADMIN')")
     public User create(@RequestBody User user){
@@ -59,11 +54,13 @@ public class UserController {
     }
 
     @DeleteMapping(path = "/{username}")
+    @PreAuthorize("hasRole('ADMIN')")
     public void delete(@PathVariable("username") String username){
         userRepository.deleteById(username);
     }
 
     @PutMapping(path = "/{username}")
+    @PreAuthorize("hasRole('ADMIN')")
     public User update(@PathVariable("username") String username, @RequestBody User user) throws Exception {
         if (userRepository.existsById(username)){
             user.setUsername(username);
