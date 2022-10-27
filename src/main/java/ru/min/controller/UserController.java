@@ -1,11 +1,15 @@
 package ru.min.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.ClientHttpRequestExecution;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.HttpStatusCodeException;
+import org.springframework.web.server.ResponseStatusException;
 import ru.min.entity.Role;
 import ru.min.entity.User;
 import ru.min.repository.RoleRepository;
@@ -22,8 +26,6 @@ public class UserController {
     UserRepository userRepository;
     @Autowired
     RoleRepository roleRepository;
-    @Autowired
-    EntityManager entityManager;
 
     @GetMapping(path = "/get-all-users")
     @PreAuthorize("hasRole('ADMIN')")
@@ -31,8 +33,8 @@ public class UserController {
         return userRepository.findAll();
     }
 
-    @GetMapping(path = "/{id}")
-    public User find(@PathVariable("id") Long id) {
+    @GetMapping(path = "{id}")
+    public ResponseEntity<?> find(@PathVariable("id") long id) {
         boolean isAdmin = false;
         User user = userRepository.findById(id);
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -40,16 +42,16 @@ public class UserController {
         Set<Role> roles = currentUser.getRoles();
 
         for (Role role:roles) {
-            if (role.getName().toString() == "ROLE_ADMIN") {
+            if (role.getName().toString() == "ROLE_ADMIN")
                 isAdmin = true;
-            }
         }
-
-        if (user.getUsername().equals(auth.getName()) || isAdmin) {
-            return user;
+        if(user.getUsername().equals(auth.getName()) || isAdmin) {
+            return new ResponseEntity<>(user, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(null, HttpStatus.FORBIDDEN);
         }
-        return null;
     }
+
     @PostMapping(consumes = "application/json")
     @PreAuthorize("hasRole('ADMIN')")
     public User create(@RequestBody User user){
