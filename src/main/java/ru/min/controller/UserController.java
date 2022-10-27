@@ -1,12 +1,18 @@
 package ru.min.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.client.ClientHttpRequestExecution;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+import ru.min.entity.Role;
 import ru.min.entity.User;
+import ru.min.repository.RoleRepository;
 import ru.min.repository.UserRepository;
 
-import java.util.Optional;
+import javax.persistence.EntityManager;
+import java.util.Set;
 
 @RestController
 @RequestMapping(path = "/users")
@@ -14,18 +20,36 @@ public class UserController {
 
     @Autowired
     UserRepository userRepository;
+    @Autowired
+    RoleRepository roleRepository;
+    @Autowired
+    EntityManager entityManager;
 
-    @GetMapping
-    @PreAuthorize("hasRole('USER') or hasRole('MODERATOR') or hasRole('ADMIN')")
+    @GetMapping(path = "/get-all-users")
+    @PreAuthorize("hasRole('ADMIN')")
     public Iterable<User> findAll(){
         return userRepository.findAll();
     }
 
-    @GetMapping(path = "/{username}")
-    public Optional<User> find(@PathVariable("username") String username){
-        return userRepository.findById(username);
-    }
+    @GetMapping(path = "/{id}")
+    public User find(@PathVariable("id") Long id) {
+        boolean isAdmin = false;
+        User user = userRepository.findById(id);
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        User currentUser = userRepository.findUserByUsername(auth.getName());
+        Set<Role> roles = currentUser.getRoles();
 
+        for (Role role:roles) {
+            if (role.getName().toString() == "ROLE_ADMIN") {
+                isAdmin = true;
+            }
+        }
+
+        if (user.getUsername().equals(auth.getName()) || isAdmin) {
+            return user;
+        }
+        return null;
+    }
     @PostMapping(consumes = "application/json")
     @PreAuthorize("hasRole('ADMIN')")
     public User create(@RequestBody User user){
