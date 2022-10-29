@@ -6,11 +6,17 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import ru.min.entity.Role;
 import ru.min.entity.User;
 import ru.min.repository.RoleRepository;
 import ru.min.repository.UserRepository;
+import org.springframework.transaction.annotation.Transactional;
+
+import javax.persistence.EntityManager;
+import javax.persistence.Query;
 import java.util.Set;
 
 @RestController
@@ -21,6 +27,10 @@ public class UserController {
     UserRepository userRepository;
     @Autowired
     RoleRepository roleRepository;
+    @Autowired
+    EntityManager entityManager;
+    @Autowired
+    PasswordEncoder passwordEncoder;
 
     @GetMapping(path = "/get-all-users")
     @PreAuthorize("hasRole('ADMIN')")
@@ -49,8 +59,16 @@ public class UserController {
     //todo добавить возможность передавать роль либо присваивать по умолчанию USER, если нет
     @PostMapping(consumes = "application/json")
     @PreAuthorize("hasRole('ADMIN')")
+    @Transactional
     public User create(@RequestBody User user){
-        return userRepository.save(user);
+        User newUser = new User(user.getUsername(),
+                passwordEncoder.encode(user.getPassword()),
+                user.getEmail());
+        userRepository.save(newUser);
+        Long userID = newUser.getId();
+        System.out.println(userID);
+        entityManager.createNativeQuery("insert into user_roles values (" + userID + ", 1)").executeUpdate();
+        return newUser;
     }
 
     @DeleteMapping(path = "/{username}")

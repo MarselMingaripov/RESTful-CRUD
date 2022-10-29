@@ -1,5 +1,6 @@
 package ru.min.entity;
 
+import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.Fetch;
 
 import javax.persistence.*;
