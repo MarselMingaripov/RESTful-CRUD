@@ -6,7 +6,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import ru.min.entity.Role;
@@ -16,7 +15,7 @@ import ru.min.repository.UserRepository;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
-import javax.persistence.Query;
+import java.util.List;
 import java.util.Set;
 
 @RestController
@@ -56,7 +55,6 @@ public class UserController {
             return new ResponseEntity<>(null, HttpStatus.FORBIDDEN);
         }
     }
-    //todo добавить возможность передавать роль либо присваивать по умолчанию USER, если нет
     @PostMapping(consumes = "application/json")
     @PreAuthorize("hasRole('ADMIN')")
     @Transactional
@@ -66,8 +64,9 @@ public class UserController {
                 user.getEmail());
         userRepository.save(newUser);
         Long userID = newUser.getId();
-        System.out.println(userID);
-        entityManager.createNativeQuery("insert into user_roles values (" + userID + ", 1)").executeUpdate();
+        List<Object[]> list = entityManager.createNativeQuery("select id from t_role where name = 'ROLE_USER'").getResultList();
+        System.out.println(list.get(0));
+        entityManager.createNativeQuery("insert into user_roles values (" + userID + ", " + list.get(0) + ")").executeUpdate();
         return newUser;
     }
 
