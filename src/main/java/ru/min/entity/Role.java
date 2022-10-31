@@ -11,6 +11,7 @@ public class Role {
     @Enumerated(EnumType.STRING)
     @Column(length = 20)
     private Erole name;
+    private String roleDescription;
 
     public Role() {
     }
