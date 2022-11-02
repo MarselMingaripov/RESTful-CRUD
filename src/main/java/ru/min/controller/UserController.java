@@ -53,12 +53,12 @@ public class UserController {
         }
         if (user.getUsername().equals(auth.getName()) || isAdmin) {
             return new ResponseEntity<>(user, HttpStatus.OK);
-        } else {
-            return new ResponseEntity<>(null, HttpStatus.FORBIDDEN);
         }
+
+        return new ResponseEntity<>(null, HttpStatus.FORBIDDEN);
     }
 
-    @PostMapping(consumes = "application/json")
+    @PostMapping(path = "/create-user", consumes = "application/json")
     @PreAuthorize("hasRole('ADMIN')")
     @Transactional
     public User create(@RequestBody User user) {
@@ -93,7 +93,6 @@ public class UserController {
                     roles.add(userRole);
                 }
             }
-
         }
         newUser.setRoles(roles);
         userRepository.save(newUser);
@@ -102,13 +101,13 @@ public class UserController {
     }
 
 
-    @DeleteMapping(path = "/{username}")
+    @DeleteMapping(path = "/delete/{username}")
     @PreAuthorize("hasRole('ADMIN')")
     public void delete(@PathVariable("username") String username) {
         userRepository.deleteById(username);
     }
 
-    @PutMapping(path = "/{username}")
+    @PutMapping(path = "/update/{username}")
     @PreAuthorize("hasRole('ADMIN')")
     public User update(@PathVariable("username") String username, @RequestBody User user) throws Exception {
         if (userRepository.existsById(username)) {
