@@ -68,15 +68,14 @@ public class UserController {
         Set<Role> reqRoles = user.getRoles();
         Set<Role> roles = new HashSet<>();
 
-        if (reqRoles == null) {
+        if (reqRoles.isEmpty()) {
             Role userRole = roleRepository
                     .findByName(Erole.ROLE_USER)
                     .orElseThrow(() -> new RuntimeException("Error, Role USER is not found"));
             roles.add(userRole);
-        } else {
 
+        } else {
             for (Role role : reqRoles) {
-                System.out.println(role.getClass().getSimpleName());
                 if (Erole.ROLE_ADMIN.equals(role.getName())) {
                     Role adminRole = roleRepository
                             .findByName(Erole.ROLE_ADMIN)
@@ -92,17 +91,13 @@ public class UserController {
                             .findByName(Erole.ROLE_USER)
                             .orElseThrow(() -> new RuntimeException("Error, Role USER is not found"));
                     roles.add(userRole);
-                    // }
                 }
-                ;
             }
-            newUser.setRoles(roles);
-            userRepository.save(newUser);
-//        Long userID = newUser.getId();
-//        List<Object[]> list = entityManager.createNativeQuery("select id from t_role where name = 'ROLE_USER'").getResultList();
-//        System.out.println(list.get(0));
-//        entityManager.createNativeQuery("insert into user_roles values (" + userID + ", " + list.get(0) + ")").executeUpdate();
+
         }
+        newUser.setRoles(roles);
+        userRepository.save(newUser);
+
         return newUser;
     }
 
