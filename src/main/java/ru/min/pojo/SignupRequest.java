@@ -1,8 +1,11 @@
 package ru.min.pojo;
 
+
+import javax.validation.constraints.NotBlank;
 import java.util.Set;
 
 public class SignupRequest {
+    @NotBlank
     private String username;
     private String password;
     private String email;
