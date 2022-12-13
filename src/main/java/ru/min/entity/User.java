@@ -1,5 +1,6 @@
 package ru.min.entity;
 
+import com.sun.istack.NotNull;
 import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.Fetch;
 
@@ -17,6 +18,7 @@ public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @NotNull
     private String username;
     private String password;
     private String email;
