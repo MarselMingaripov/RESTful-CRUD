@@ -1,0 +1,8 @@
+-------------------------------------------------------------------------------
+Test set: repository.UserRepositoryTest
+-------------------------------------------------------------------------------
+Tests run: 1, Failures: 0, Errors: 1, Skipped: 0, Time elapsed: 0.747 s <<< FAILURE! - in repository.UserRepositoryTest
+whenFindByUsername_thenReturnUser  Time elapsed: 0.726 s  <<< ERROR!
+java.lang.NullPointerException: Cannot invoke "ru.min.repository.UserRepository.findByUsername(String)" because "this.userRepository" is null
+	at repository.UserRepositoryTest.whenFindByUsername_thenReturnUser(UserRepositoryTest.java:39)
+
