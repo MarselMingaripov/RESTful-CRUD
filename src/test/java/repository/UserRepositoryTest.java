@@ -1,12 +1,13 @@
 package repository;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.*;
 import ru.min.entity.User;
 import ru.min.repository.UserRepository;
 import javax.persistence.EntityManager;
+import java.util.Optional;
+
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.BDDMockito.given;
 
@@ -89,23 +90,52 @@ class UserRepositoryTest {
         assertEquals(false, test);
     }
 
-//    @Test
-//    void whenFindById_thenReturnUser() {
-//        final User user = mock(User.class);
-//        user.setUsername("userNameTest");
-//        user.setEmail("emailTest@mail.com");
-//        user.setPassword("123456Qw");
-//        entityManager.persist(user);
-//        when(user.getId()).thenReturn(ID);
-//
-//        userRepository.findById(ID);
-//        final User actual = userRepository.findById(ID);
-//
-//        assertNotNull(actual);
-//        assertEquals(user, actual);
-//    }
+    @Test
+    void whenFindById_thenReturnUser() {
+        ArgumentCaptor<User> captor = ArgumentCaptor.forClass(User.class);
 
-//    @Test
-//    void findByUsername() {
-//    }
+        User user = new User();
+        user.setUsername(USERNAME);
+        user.setEmail("emailTest@mail.com");
+        user.setPassword("123456Qw");
+
+        entityManager.persist(user);
+        entityManager.flush();
+        Mockito.verify(entityManager).persist(captor.capture());
+
+        User actual = captor.getValue();
+
+        given(userRepository.findById(actual.getId())).willReturn(actual);
+
+        User test = userRepository.findById(actual.getId());
+        Mockito.verify(userRepository).findById(actual.getId());
+
+        assertNotNull(actual);
+        assertEquals(actual, test);
+    }
+
+    @Test
+    void findByUsername() {
+        ArgumentCaptor<User> captor = ArgumentCaptor.forClass(User.class);
+
+        User user = new User();
+        user.setUsername(USERNAME);
+        user.setEmail("emailTest@mail.com");
+        user.setPassword("123456Qw");
+
+
+        entityManager.persist(user);
+        entityManager.flush();
+        Mockito.verify(entityManager).persist(captor.capture());
+        User actual = captor.getValue();
+
+        given(userRepository.findByUsername(USERNAME)).willReturn(Optional.ofNullable(actual));
+        //Mockito.verify(userRepository).findByUsername(USERNAME);
+
+
+        Optional<User> found = userRepository.findByUsername(USERNAME);
+
+        assertNotNull(actual);
+        assertEquals(actual, found.get());
+    }
 }
