@@ -1,0 +1,18 @@
+version: "3.1"
+services:
+  app:
+    container_name: "springboot"
+    image: springboot
+    build: ./
+    ports:
+      - "8080:8080"
+    depends_on:
+      - postgresql
+  postgresql:
+    image: postgres:alpine3.17
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_USERNAME=postgres
+      - POSTGRES_DB=db

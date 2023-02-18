@@ -19,7 +19,6 @@ import ru.min.repository.RoleRepository;
 import ru.min.repository.UserRepository;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.persistence.EntityManager;
 import java.util.HashSet;
 import java.util.Set;
 
