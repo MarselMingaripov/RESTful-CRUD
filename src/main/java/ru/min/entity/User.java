@@ -1,8 +1,6 @@
 package ru.min.entity;
 
 import com.sun.istack.NotNull;
-import org.hibernate.annotations.Cascade;
-import org.hibernate.annotations.Fetch;
 
 import javax.persistence.*;
 import java.util.HashSet;
@@ -11,8 +9,7 @@ import java.util.Set;
 @Entity
 @Table(name = "t_user", uniqueConstraints = {
         @UniqueConstraint(columnNames = "username"),
-        @UniqueConstraint(columnNames = "password")
-})
+        @UniqueConstraint(columnNames = "password")})
 public class User {
 
     @Id
