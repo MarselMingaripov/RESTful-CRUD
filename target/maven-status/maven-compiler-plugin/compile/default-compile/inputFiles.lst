@@ -14,5 +14,6 @@ C:\Users\User\Documents\IdeaProjects\RESTful-CRUD-API\src\main\java\ru\min\confi
 C:\Users\User\Documents\IdeaProjects\RESTful-CRUD-API\src\main\java\ru\min\Application.java
 C:\Users\User\Documents\IdeaProjects\RESTful-CRUD-API\src\main\java\ru\min\entity\Role.java
 C:\Users\User\Documents\IdeaProjects\RESTful-CRUD-API\src\main\java\ru\min\config\jwt\AuthTokenFilter.java
+C:\Users\User\Documents\IdeaProjects\RESTful-CRUD-API\src\main\java\ru\min\config\OpenApi30Config.java
 C:\Users\User\Documents\IdeaProjects\RESTful-CRUD-API\src\main\java\ru\min\repository\UserRepository.java
 C:\Users\User\Documents\IdeaProjects\RESTful-CRUD-API\src\main\java\ru\min\pojo\JwtResponse.java

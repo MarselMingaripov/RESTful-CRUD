@@ -13,6 +13,7 @@ ru\min\config\jwt\AuthTokenFilter.class
 ru\min\config\jwt\JwtUtils.class
 ru\min\repository\UserRepository.class
 ru\min\pojo\MessageResponse.class
+ru\min\config\OpenApi30Config.class
 ru\min\pojo\JwtResponse.class
 ru\min\repository\RoleRepository.class
 ru\min\service\UserDetailsServiceImpl.class

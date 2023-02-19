@@ -3,6 +3,7 @@ package ru.min.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -37,9 +38,11 @@ public class UserController {
     @GetMapping(path = "/all")
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "получить всех пользователей из бд")
+
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "запрос успешно выполнен")
     })
+    @SecurityRequirement(name = "bearerAuth")
     public Iterable<User> findAll() {
         return userRepository.findAll();
     }
@@ -50,22 +53,10 @@ public class UserController {
             @ApiResponse(responseCode = "200", description = "запрос успешно выполнен"),
             @ApiResponse(responseCode = "403", description = "запрещен доступ")
     })
+    @SecurityRequirement(name = "bearerAuth")
     public ResponseEntity<?> find(@PathVariable("id") long id) {
-        boolean isAdmin = false;
         User user = userRepository.findById(id);
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        User currentUser = userRepository.findUserByUsername(auth.getName());
-        Set<Role> roles = currentUser.getRoles();
-
-        for (Role role : roles) {
-            if (role.getName().toString() == "ROLE_ADMIN")
-                isAdmin = true;
-        }
-        if (user.getUsername().equals(auth.getName()) || isAdmin) {
-            return new ResponseEntity<>(user, HttpStatus.OK);
-        }
-
-        return new ResponseEntity<>(null, HttpStatus.FORBIDDEN);
+        return ResponseEntity.ok(user);
     }
 
     @PostMapping(path = "/", consumes = "application/json")
@@ -77,6 +68,7 @@ public class UserController {
             @ApiResponse(responseCode = "401", description = "пользователь не авторизован"),
             @ApiResponse(responseCode = "403", description = "запрещен доступ")
     })
+    @SecurityRequirement(name = "bearerAuth")
     public ResponseEntity<User> create(@RequestBody User user) {
         User newUser = new User(user.getUsername(),
                 passwordEncoder.encode(user.getPassword()),
@@ -125,6 +117,7 @@ public class UserController {
             @ApiResponse(responseCode = "401", description = "пользователь не авторизован"),
             @ApiResponse(responseCode = "403", description = "запрещен доступ")
     })
+    @SecurityRequirement(name = "bearerAuth")
     public ResponseEntity<Void> delete(@PathVariable("username") String username) {
         userRepository.deleteById(username);
         return ResponseEntity.ok().build();
@@ -138,6 +131,7 @@ public class UserController {
             @ApiResponse(responseCode = "401", description = "пользователь не авторизован"),
             @ApiResponse(responseCode = "403", description = "запрещен доступ")
     })
+    @SecurityRequirement(name = "bearerAuth")
     public ResponseEntity<User> update(@PathVariable("username") String username, @RequestBody User user) throws Exception {
         if (userRepository.existsById(username)) {
             user.setUsername(username);

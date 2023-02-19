@@ -4,8 +4,6 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.AfterDomainEventPublication;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -79,8 +77,7 @@ public class AuthController {
     @PostMapping("/signup")
     @Operation(summary = "регистрация")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Регистрация успешна"),
-            @ApiResponse(responseCode = "400", description = "Ошибка регистрации")
+            @ApiResponse(responseCode = "200", description = "Регистрация успешна")
     })
     public ResponseEntity<?> registerUser(@Valid @RequestBody SignupRequest signupRequest) {
         if (userRepository.existsByUsername(signupRequest.getUsername())) {
