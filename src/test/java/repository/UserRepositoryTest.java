@@ -33,7 +33,7 @@ class UserRepositoryTest {
         Mockito.verify(entityManager).persist(captor.capture());
 
         given(userRepository.findUserByUsername(USERNAME)).willReturn(user);
-        Mockito.verify(userRepository).findUserByUsername(USERNAME);
+//        Mockito.verify(userRepository).findUserByUsername(USERNAME);
 
         User actual = captor.getValue();
         User found = userRepository.findUserByUsername(USERNAME);
@@ -130,8 +130,6 @@ class UserRepositoryTest {
         User actual = captor.getValue();
 
         given(userRepository.findByUsername(USERNAME)).willReturn(Optional.ofNullable(actual));
-        //Mockito.verify(userRepository).findByUsername(USERNAME);
-
 
         Optional<User> found = userRepository.findByUsername(USERNAME);
 

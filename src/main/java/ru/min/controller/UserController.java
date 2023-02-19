@@ -1,5 +1,10 @@
 package ru.min.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,13 +20,12 @@ import ru.min.repository.RoleRepository;
 import ru.min.repository.UserRepository;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.persistence.EntityManager;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 @RestController
 @RequestMapping(path = "/users")
+@Tag(name = "API для работы с пользователями")
 public class UserController {
 
     @Autowired
@@ -29,39 +33,43 @@ public class UserController {
     @Autowired
     RoleRepository roleRepository;
     @Autowired
-    EntityManager entityManager;
-    @Autowired
     PasswordEncoder passwordEncoder;
 
-    @GetMapping(path = "/get-all-users")
+    @GetMapping(path = "/all")
     @PreAuthorize("hasRole('ADMIN')")
+    @Operation(summary = "получить всех пользователей из бд")
+
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "запрос успешно выполнен")
+    })
+    @SecurityRequirement(name = "bearerAuth")
     public Iterable<User> findAll() {
         return userRepository.findAll();
     }
 
     @GetMapping(path = "{id}")
+    @Operation(summary = "получить пользователя по ид")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "запрос успешно выполнен"),
+            @ApiResponse(responseCode = "403", description = "запрещен доступ")
+    })
+    @SecurityRequirement(name = "bearerAuth")
     public ResponseEntity<?> find(@PathVariable("id") long id) {
-        boolean isAdmin = false;
         User user = userRepository.findById(id);
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        User currentUser = userRepository.findUserByUsername(auth.getName());
-        Set<Role> roles = currentUser.getRoles();
-
-        for (Role role : roles) {
-            if (role.getName().toString() == "ROLE_ADMIN")
-                isAdmin = true;
-        }
-        if (user.getUsername().equals(auth.getName()) || isAdmin) {
-            return new ResponseEntity<>(user, HttpStatus.OK);
-        }
-
-        return new ResponseEntity<>(null, HttpStatus.FORBIDDEN);
+        return ResponseEntity.ok(user);
     }
 
-    @PostMapping(path = "/create-user", consumes = "application/json")
+    @PostMapping(path = "/", consumes = "application/json")
     @PreAuthorize("hasRole('ADMIN')")
     @Transactional
-    public User create(@RequestBody User user) {
+    @Operation(summary = "добавить пользователя")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "запрос успешно выполнен"),
+            @ApiResponse(responseCode = "401", description = "пользователь не авторизован"),
+            @ApiResponse(responseCode = "403", description = "запрещен доступ")
+    })
+    @SecurityRequirement(name = "bearerAuth")
+    public ResponseEntity<User> create(@RequestBody User user) {
         User newUser = new User(user.getUsername(),
                 passwordEncoder.encode(user.getPassword()),
                 user.getEmail());
@@ -97,22 +105,37 @@ public class UserController {
         newUser.setRoles(roles);
         userRepository.save(newUser);
 
-        return newUser;
+        return ResponseEntity.ok().body(newUser);
     }
 
 
-    @DeleteMapping(path = "/delete/{username}")
+    @DeleteMapping(path = "/{username}")
     @PreAuthorize("hasRole('ADMIN')")
-    public void delete(@PathVariable("username") String username) {
+    @Operation(summary = "удалить пользователя")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "запрос успешно выполнен"),
+            @ApiResponse(responseCode = "401", description = "пользователь не авторизован"),
+            @ApiResponse(responseCode = "403", description = "запрещен доступ")
+    })
+    @SecurityRequirement(name = "bearerAuth")
+    public ResponseEntity<Void> delete(@PathVariable("username") String username) {
         userRepository.deleteById(username);
+        return ResponseEntity.ok().build();
     }
 
-    @PutMapping(path = "/update/{username}")
+    @PutMapping(path = "/{username}")
     @PreAuthorize("hasRole('ADMIN')")
-    public User update(@PathVariable("username") String username, @RequestBody User user) throws Exception {
+    @Operation(summary = "изменить пользователя")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "запрос успешно выполнен"),
+            @ApiResponse(responseCode = "401", description = "пользователь не авторизован"),
+            @ApiResponse(responseCode = "403", description = "запрещен доступ")
+    })
+    @SecurityRequirement(name = "bearerAuth")
+    public ResponseEntity<User> update(@PathVariable("username") String username, @RequestBody User user) throws Exception {
         if (userRepository.existsById(username)) {
             user.setUsername(username);
-            return userRepository.save(user);
+            return ResponseEntity.ok().body(userRepository.save(user));
         } else {
             throw new Exception("Bad Request!!!");
         }
